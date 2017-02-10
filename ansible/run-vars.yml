@@ -3,6 +3,7 @@
 # See https://groups.google.com/forum/#!topic/ansible-project/XURTfj64OKA for the use of the default structure below
 # - defaults need to be set here or a blank variable is set from the nonexistent environment variable
 ---
-preferences_server_data_loader_couchdb_host_address: "{{ lookup('env', 'COUCHDB_HOST_ADDRESS') | default('localhost:5984',true) }}"
+preferences_server_data_loader_couchdb_host_address: "{{ lookup('env', 'COUCHDB_HOST_ADDRESS') | default('localhost',true) }}"
+preferences_server_data_loader_couchdb_host_port: "{{ lookup('env', 'COUCHDB_HOST_PORT') | default('5984',true) }}"
 preferences_server_data_loader_cleanup_after: false
 preferences_server_data_loader_clear_index: "{{ lookup('env', 'CLEAR_INDEX') | default(false,true) }}"
