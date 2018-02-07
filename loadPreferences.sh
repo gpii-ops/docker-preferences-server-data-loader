@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PREFS_DIR=${PREFERENCES_DIR:-/home/node/universal/testData/preferences}
+DATA_DIR=${DBDATA_DIR:-/home/node/universal/testData/dbData}
 
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
@@ -27,13 +27,12 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit preferences
-for file in $PREFS_DIR/*.json; do
-  FILENAME=$(basename "$file" .json)
-  DATA="{ \"_id\":\"$FILENAME\", \"value\":$(cat "$file") }"
+for file in $DATA_DIR/*.json; do
+  DATA="{ \"docs\":$(cat "$file") }"
 
-  log "Submitting $FILENAME.json"
-  if ! curl -fsS -q -H 'Content-Type: application/json' -X POST "$COUCHDB_URL" -d "$DATA"; then
-    log "Error submitting $FILENAME. Terminating."
+  log "Submitting $file"
+  if ! curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d "$DATA"; then
+    log "Error submitting $file. Terminating."
     exit 1
   fi
 
