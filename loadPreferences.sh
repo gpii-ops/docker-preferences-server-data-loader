@@ -28,10 +28,13 @@ fi
 
 # Submit preferences
 for file in $DATA_DIR/*.json; do
-  DATA="{ \"docs\":$(cat "$file") }"
-
   log "Submitting $file"
-  if ! curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d "$DATA"; then
+
+  curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
+{"docs": $(cat $file)}
+CURL_DATA
+
+  if [ $? -ne 0 ]; then
     log "Error submitting $file. Terminating."
     exit 1
   fi
