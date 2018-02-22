@@ -4,7 +4,7 @@ Builds a [sidecar container](http://blog.kubernetes.io/2015/06/the-distributed-s
 
 ## Building
 
-- `docker build -t gpii/preferences-dataloader .`
+- `docker build -t gpii/gpii-dataloader .`
 
 ## Environment Variables
 
@@ -18,12 +18,12 @@ Example using containers:
 
 ```
 $ docker run -d -p 5984:5984 --name couchdb couchdb
-$ docker run --rm --link couchdb -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 gpii/preferences-dataloader
+$ docker run --rm --link couchdb -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 gpii/gpii-dataloader
 $ docker run --name flowmanager -d -p 8081:8081 --link couchdb -e NODE_ENV=gpii.config.cloudBased.production -e COUCHDB_HOST_ADDRESS=couchdb gpii/flow-manager
 ```
 
 Loading couchdb data from a different location (e.g. /mydata):
 
 ```
-$ docker run --rm -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX -e DBDATA_DIR=/mydata -v /home/user/mydata:/mydata gpii/preferences-dataloader
+$ docker run --rm -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX -e DBDATA_DIR=/mydata -v /home/user/mydata:/mydata gpii/gpii-dataloader
 ```

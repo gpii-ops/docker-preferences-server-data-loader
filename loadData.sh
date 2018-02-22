@@ -26,7 +26,7 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
   exit 1
 fi
 
-# Submit preferences
+# Submit data
 for file in $DATA_DIR/*.json; do
   log "Submitting $file"
 
