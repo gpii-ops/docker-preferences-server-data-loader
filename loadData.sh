@@ -22,8 +22,7 @@ fi
 
 log "Creating database at $COUCHDB_URL"
 if ! curl -fsS -X PUT "$COUCHDB_URL"; then
-  log "Error creating database"
-  exit 1
+  log "Database already exists at $COUCHDB_URL"
 fi
 
 # Submit data
