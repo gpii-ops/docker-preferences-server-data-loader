@@ -26,7 +26,7 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
-for file in $DATA_DIR/*.json5; do
+for file in $DATA_DIR/*.json; do
   log "Submitting $file"
 
   curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
