@@ -28,8 +28,8 @@ $ docker run -d -p 8081:8081 --name preferences --link couchdb -e NODE_ENV=gpii.
 
 ```
 
-Loading couchdb data from a different location (e.g. /mydata):
+Loading couchdb data from a different location (e.g. /home/vagrant/sync/universal/testData/dbData for static data directory and /home/vagrant/sync/universal/build/dbData for build data directory):
 
 ```
-$ docker run --rm -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 -e STATIC_DATA_DIR=/static_data -v /home/user/static_data:/mydata -e BUILD_DATA_DIR=/build_data -v /home/user/build_data:/mydata gpii/gpii-dataloader
+$ docker run --name dataloader --link couchdb -v /home/vagrant/sync/universal/testData/dbData:/static_data -e STATIC_DATA_DIR=/static_data -v /home/vagrant/sync/universal/build/dbData:/build_data -e BUILD_DATA_DIR=/build_data -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 gpii/gpii-dataloader
 ```

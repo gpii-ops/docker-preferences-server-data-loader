@@ -3,10 +3,26 @@
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
 BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData}
 
-DATA_DIRS=($STATIC_DATA_DIR $BUILD_DATA_DIR)
-
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
+}
+
+loadData() {
+  log "Loading data from $1"
+
+  for file in $1/*.json; do
+    log "Submitting $file"
+
+    curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
+{"docs": $(cat $file)}
+CURL_DATA
+
+    if [ $? -ne 0 ]; then
+      log "Error submitting $file. Terminating."
+      exit 1
+    fi
+  done
+  log "Finished loading data from $1"
 }
 
 if [ -z "$COUCHDB_URL" ]; then
@@ -29,20 +45,5 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
-for data_dir in ${DATA_DIRS[@]}; do
-    log "Loading data from $data_dir"
-    for file in $data_dir/*.json; do
-      log "Submitting $file"
-
-      curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
-{"docs": $(cat $file)}
-CURL_DATA
-
-      if [ $? -ne 0 ]; then
-        log "Error submitting $file. Terminating."
-        exit 1
-      fi
-
-      log "Finished loading data from $data_dir"
-    done
-done
+loadData $STATIC_DATA_DIR
+loadData $BUILD_DATA_DIR
