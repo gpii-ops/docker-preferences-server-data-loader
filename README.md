@@ -24,11 +24,12 @@ Example using containers:
 ```
 $ docker run -d -p 5984:5984 --name couchdb couchdb
 $ docker run --rm --link couchdb -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 gpii/gpii-dataloader
-$ docker run --name flowmanager -d -p 8081:8081 --link couchdb -e NODE_ENV=gpii.config.cloudBased.production -e COUCHDB_HOST_ADDRESS=couchdb gpii/flow-manager
+$ docker run -d -p 8081:8081 --name preferences --link couchdb -e NODE_ENV=gpii.config.preferencesServer.standalone.production  -e PREFERENCESSERVER_LISTEN_PORT=8081 -e DATASOURCE_HOSTNAME=http://couchdb -e DATASOURCE_PORT=5984 vagrant-universal
+
 ```
 
 Loading couchdb data from a different location (e.g. /mydata):
 
 ```
-$ docker run --rm -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX -e DBDATA_DIR=/mydata -v /home/user/mydata:/mydata gpii/gpii-dataloader
+$ docker run --rm -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 -e STATIC_DATA_DIR=/static_data -v /home/user/static_data:/mydata -e BUILD_DATA_DIR=/build_data -v /home/user/build_data:/mydata gpii/gpii-dataloader
 ```
