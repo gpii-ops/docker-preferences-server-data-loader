@@ -10,7 +10,12 @@ Builds a [sidecar container](http://blog.kubernetes.io/2015/06/the-distributed-s
 
 - `COUCHDB_URL`: URL of the CouchDB database. (required)
 - `CLEAR_INDEX`: If defined, the database at $COUCHDB_URL will be deleted and recreated. (optional)
-- `DBDATA_DIR`: This is useful if you want to mount the database data using a Docker volume and point the data loader at it (optional)
+- `STATIC_DATA_DIR`: The directory where the static data to be loaded into CouchDB resides. (optional)
+- `BUILD_DATA_DIR`: The directory where the data built from a npm step resides. (optional)
+
+The use of environment variables for data directories is useful if you want to mount the database data using a Docker volume and point the data loader at it.
+
+Note that since [the docker doesn't support the environment variable type of array](https://github.com/moby/moby/issues/20169), two separate environment variables are used for inputting data directories instead of one array that holds these directories.
 
 ## Running
 
