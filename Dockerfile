@@ -8,8 +8,8 @@ RUN apk add --no-cache curl git && \
     rm package-lock.json && \
     npm install json5 && \
     npm install fs && \
-    rm -rf build && \
-    mkdir -p build/dbData && \
+    npm install rimraf && \
+    npm install mkdirp && \
     node scripts/convertPrefs.js testData/preferences/ build/dbData/ && \
     apk del git
 
