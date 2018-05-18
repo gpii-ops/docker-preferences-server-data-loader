@@ -1,11 +1,18 @@
-FROM alpine:3.6
+FROM node:8-alpine
 
 WORKDIR /home/node
 
 RUN apk add --no-cache curl git && \
-    git clone --depth=1 https://github.com/GPII/universal.git && \
+    git clone -b GPII-2630 https://github.com/cindyli/universal.git && \
+    cd universal && \
+    rm package-lock.json && \
+    npm install json5 && \
+    npm install fs && \
+    npm install rimraf && \
+    npm install mkdirp && \
+    node scripts/convertPrefs.js testData/preferences/ build/dbData/ && \
     apk del git
 
-COPY loadPreferences.sh /usr/local/bin
+COPY loadData.sh /usr/local/bin
 
-CMD ["/usr/local/bin/loadPreferences.sh"]
+CMD ["/usr/local/bin/loadData.sh"]
