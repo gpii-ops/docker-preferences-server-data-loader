@@ -54,7 +54,7 @@ dbLoader.processSnapsets = function (response) {
         dbLoader.snapSets = JSON.parse(snapSetsString);
 //        debugger;
         dbLoader.snapSets.rows.forEach(function (aSnapset) {
-            aSnapset.value._deleted = "true";
+            aSnapset.value._deleted = true;
 //            debugger;
             console.log(aSnapset.value._rev);
             dbLoader.docsToRemove.push(aSnapset.value);
