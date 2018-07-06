@@ -2,6 +2,7 @@
 
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
 BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData}
+NODE_PATH=${NODE_PATH:-/home/node/universal}
 
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
@@ -45,5 +46,6 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
+node $NODE_PATH/scripts/deleteSnapsets.js $COUCHDB_URL
 loadData $STATIC_DATA_DIR
 loadData $BUILD_DATA_DIR

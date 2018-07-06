@@ -13,6 +13,6 @@ RUN apk add --no-cache curl git && \
     node scripts/convertPrefs.js testData/preferences/ build/dbData/ && \
     apk del git
 
-COPY loadData.sh /usr/local/bin
+COPY deleteAndLoadSnapsets.sh /usr/local/bin/
 
-CMD ["/usr/local/bin/loadData.sh"]
+CMD ["/usr/local/bin/deleteAndLoadSnapsets.sh"]

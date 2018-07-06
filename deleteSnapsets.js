@@ -52,11 +52,9 @@ dbLoader.processSnapsets = function (response) {
         dbLoader.snapSets = JSON.parse(snapSetsString);
         dbLoader.snapSets.rows.forEach(function (aSnapset) {
             aSnapset.value._deleted = true;
-            fluid.log(aSnapset.value._rev);
             dbLoader.docsToRemove.push(aSnapset.value);
         });
         dbLoader.addGpiiKeysAndBulkDelete(dbLoader.snapSets.rows, dbLoader.docsToRemove);
-        fluid.log("Back from dbLoader.addGpiiKeysAndBulkDelete(), docsToRemove is: " + JSON.stringify({"docs": dbLoader.docsToRemove}));
     });
 };
 
@@ -70,7 +68,6 @@ dbLoader.addGpiiKeysAndBulkDelete = function (snapSets, docsToRemove) {
     fluid.each (snapSets, function (aSnapset) {
         var gpiiKeyId = aSnapset.value._id;
         var gpiiKeyViewUrl = dbLoader.gpiiKeyViewUrl + "?key=%22" + gpiiKeyId + "%22";
-        fluid.log("addGpiiKeysAndBulkDelete: gpiiKeyViewUrl is " + gpiiKeyViewUrl);
         var getGpiiKeysRequest = http.request(gpiiKeyViewUrl, function (resp) {
             var respString = "";
             resp.setEncoding("utf8");
@@ -83,7 +80,6 @@ dbLoader.addGpiiKeysAndBulkDelete = function (snapSets, docsToRemove) {
             // Note - if there is a way to determine the final "end" event, then
             // it could  call doBatchDelete().
             resp.on("end", function () {
-                fluid.log("addGpiiKeysAndBulkDelete: respString is " + respString);
                 var gpiiKeyRecords = JSON.parse(respString);
                 gpiiKeyRecords.rows.forEach(function (record) {
                     dbLoader.deleteGpiiKey(record.value);
@@ -113,17 +109,9 @@ dbLoader.deleteGpiiKey = function (gpiiKey) {
         }
     };
     deleteOptions.path = "/gpii/" + gpiiKey._id + "?rev=" + gpiiKey._rev;
-    fluid.log("deleteGpiiKey(): path is '" + deleteOptions.path + "'");
     var deleteGpiiKeyRequest = http.request(deleteOptions, function (res) {
         fluid.log("STATUS: " + res.statusCode);
         fluid.log("HEADERS: " + JSON.stringify(res.headers, null, 2));
-        res.setEncoding('utf8');
-        res.on("data", (chunk) => {
-            fluid.log("BODY: " + chunk);
-        });
-        res.on("end", function () {
-            fluid.log("GPII Key deleted");
-        });
     });
     deleteGpiiKeyRequest.on("error", function (e) {
         fluid.log("Error finding GPII Key: " + e.message);
@@ -149,17 +137,11 @@ dbLoader.doBatchDelete = function (docsToRemove) {
     };
     var batchPostData = JSON.stringify({"docs": docsToRemove});
     batchDeleteOptions.headers["Content-Length"] = Buffer.byteLength(batchPostData);
-    fluid.log("Batch Delete snapsets: " + batchPostData);
-    console.log("Batch Delete snapsets: " + JSON.stringify(batchDeleteOptions, null, 2));
     var batchDeleteReq = http.request(batchDeleteOptions, function (res) {
         fluid.log("STATUS: " + res.statusCode);
         fluid.log("HEADERS: " + JSON.stringify(res.headers, null, 2));
-        res.setEncoding('utf8');
-        res.on('data', (chunk) => {
-            fluid.log("BODY: " + chunk);
-        });
         res.on('end', function () {
-            fluid.log('Batch Delete snapsets: No more data in response.');
+            fluid.log('Batch deletion of snapsets');
         });
     });
     batchDeleteReq.on('error', function (e) {
