@@ -12,26 +12,22 @@ https://github.com/GPII/universal/blob/master/LICENSE.txt
 // 1. Finds all the Prefs Safes of type "snapset" (prefsSafesType = "snapset"),
 // 2. Finds all the GPII Keys associated with each snapset Prefs Safe
 // 3. Deletes the found Prefs Safes and associated GPII Keys
-// 4. Loads the latest Prefs Safes and GPII Keys from %universal/build/dbData
-// 5. Loads the latest credentials, clients, and views from %universal/testData/dbData
 //
 // A sample command that runs this script:
-// node deleteAndLoadSnapsets.js COUCHDBURL
+// node deleteAndLoadSnapsets.js $COUCHDBURL
 
 "use strict";
 
 var http = require('http'),
-    fluid = require("../universal/node_modules/infusion");
+    fluid = require("infusion");
 
 var gpii = fluid.registerNamespace("gpii");
 fluid.registerNamespace("gpii.dataLoader");
 fluid.setLogging(fluid.logLevel.INFO)
 
 var dbLoader = gpii.dataLoader;
-
-debugger;
 dbLoader.couchDBURL = process.argv[2];
-if (gpii.dataLoader.couchDBURL === undefined) {
+if (!fluid.isValue(dbLoader.couchDBURL)) {
     fluid.log ("COUCHDB_URL environment variable must be defined");
     process.exit(1);
 }
@@ -41,7 +37,8 @@ dbLoader.gpiiKeyViewUrl = dbLoader.couchDBURL + "/_design/views/_view/findGpiiKe
 dbLoader.docsToRemove=[];
 
 /**
- * Find the Prefs Safes of type "snapSet", and ???
+ * Find the Prefs Safes of type "snapSet", add them to an array of records to
+ * remove, then use them to find their associated GPII Key(s).
  * @param {Object} response - The response from the data base containing the
  *                            snapSet Prefs Safes as a JSON string.
  */
@@ -65,13 +62,12 @@ dbLoader.processSnapsets = function (response) {
 
 /**
  * Find the GPII key records associated with the given snapset Prefs Safes,
- * mark them for deletion, and then request that all be deleted in bulk.
+ * delete each one as found, and then batch delete all the snapset Prefs Safes.
  * @param {Array} snapSets      - The snapsets of interest.
- * @param {Array} docsToRemove  - Array to append the GPII key records to delete
+ * @param {Array} docsToRemove  - Array of records to delete.
  */
 dbLoader.addGpiiKeysAndBulkDelete = function (snapSets, docsToRemove) {
-    debugger;
-    snapSets.forEach(function (aSnapset) {
+    fluid.each (snapSets, function (aSnapset) {
         var gpiiKeyId = aSnapset.value._id;
         var gpiiKeyViewUrl = dbLoader.gpiiKeyViewUrl + "?key=%22" + gpiiKeyId + "%22";
         fluid.log("addGpiiKeysAndBulkDelete: gpiiKeyViewUrl is " + gpiiKeyViewUrl);
@@ -81,10 +77,12 @@ dbLoader.addGpiiKeysAndBulkDelete = function (snapSets, docsToRemove) {
             resp.on("data", function (chunk) {
                 respString += chunk;
             });
-            // This response doesn't end until after the call to doBatchDelete()
-            // below (too late)
+            // This response "end" event doesn't finish until after the call to
+            // doBatchDelete() below, which is too late to add the GPII Key to
+            // docsToRemove and have them removed.
+            // Note - if there is a way to determine the final "end" event, then
+            // it could  call doBatchDelete().
             resp.on("end", function () {
-                debugger;
                 fluid.log("addGpiiKeysAndBulkDelete: respString is " + respString);
                 var gpiiKeyRecords = JSON.parse(respString);
                 gpiiKeyRecords.rows.forEach(function (record) {
@@ -93,7 +91,7 @@ dbLoader.addGpiiKeysAndBulkDelete = function (snapSets, docsToRemove) {
             });
         });
         getGpiiKeysRequest.on("error", function (e) {
-            fluid.log("Finding snapsets GPII Keys error: " + e.message);
+            fluid.log("Error finding snapsets' associated GPII Keys: " + e.message);
         });
         getGpiiKeysRequest.end();
     });
@@ -124,11 +122,11 @@ dbLoader.deleteGpiiKey = function (gpiiKey) {
             fluid.log("BODY: " + chunk);
         });
         res.on("end", function () {
-            fluid.log("GPII Key deleted(?)");
+            fluid.log("GPII Key deleted");
         });
     });
     deleteGpiiKeyRequest.on("error", function (e) {
-        fluid.log("Finding snapsets GPII Keys error: " + e.message);
+        fluid.log("Error finding GPII Key: " + e.message);
     });
     deleteGpiiKeyRequest.end();
 };
@@ -165,17 +163,14 @@ dbLoader.doBatchDelete = function (docsToRemove) {
         });
     });
     batchDeleteReq.on('error', function (e) {
-        fluid.error("Error deleting snapset Prefs Safes and their GPII Keys: " + e.message);
+        fluid.error("Error deleting snapset Prefs Safes: " + e.message);
     });
     batchDeleteReq.write(batchPostData);
     batchDeleteReq.end();
 };
 
-debugger;
 dbLoader.snapSetsRequest = http.request(dbLoader.prefsSafesViewUrl, dbLoader.processSnapsets);
 dbLoader.snapSetsRequest.on("error", function (e) {
-    fluid.log("Finding snapsets Prefs Safes error: " + e.message);
+    fluid.log("Error finding snapsets Prefs Safes: " + e.message);
 });
 dbLoader.snapSetsRequest.end();
-debugger;
-var x = 5;
