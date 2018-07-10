@@ -36,7 +36,20 @@ log "Clear index: $CLEAR_INDEX"
 log "Static: $STATIC_DATA_DIR"
 log "Build: $BUILD_DATA_DIR"
 log "Node path: $NODE_PATH"
+log "Working directory: `pwd`"
 
+# Set up universal
+git clone https://github.com/GPII/universal.git
+cd universal
+rm -f package-lock.json
+npm install json5
+npm install fs
+npm install rimraf
+npm install mkdirp
+node scripts/convertPrefs.js testData/preferences/ build/dbData/
+cd -
+
+# Initialize (possibly clear) data base
 if [ ! -z "$CLEAR_INDEX" ]; then
   log "Deleting database at $COUCHDB_URL"
   if ! curl -fsS -X DELETE "$COUCHDB_URL"; then
