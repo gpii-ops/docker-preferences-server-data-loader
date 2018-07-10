@@ -32,6 +32,10 @@ if [ -z "$COUCHDB_URL" ]; then
 fi
 
 log "Starting"
+log "Clear index: $CLEAR_INDEX"
+log "Static: $STATIC_DATA_DIR"
+log "Build: $BUILD_DATA_DIR"
+log "Node path: $NODE_PATH"
 
 if [ ! -z "$CLEAR_INDEX" ]; then
   log "Deleting database at $COUCHDB_URL"
