@@ -18,7 +18,6 @@ Builds a [sidecar container](http://blog.kubernetes.io/2015/06/the-distributed-s
 - `CLEAR_INDEX`: If defined, the database at $COUCHDB_URL will be deleted and recreated. (optional)
 - `STATIC_DATA_DIR`: The directory where the static data to be loaded into CouchDB resides. (optional)
 - `BUILD_DATA_DIR`: The directory where the data built from a npm step resides. (optional)
-- `NODE_PATH`: Universal's root directory. (optional)
 
 The use of environment variables for data directories is useful if you want to mount the database data using a Docker volume and point the data loader at it.
 
@@ -35,8 +34,15 @@ $ docker run -d -p 8081:8081 --name preferences --link couchdb -e NODE_ENV=gpii.
 
 ```
 
-Loading couchdb data from a different location (e.g. /home/vagrant/sync/universal/testData/dbData for static data directory and /home/vagrant/sync/universal/build/dbData for build data directory):
+Below are two versions of loading couchdb data from a different location (e.g. /home/vagrant/sync/universal/testData/dbData for static data directory and /home/vagrant/sync/universal/build/dbData for build data directory).  The first version has the optional `CLEAR_INDEX` set to erase and reset the database prior to other database changes:
 
 ```
-$ docker run --name dataloader --link couchdb -v /home/vagrant/sync/universal/testData/dbData:/static_data -e STATIC_DATA_DIR=/static_data -v /home/vagrant/sync/universal/build/dbData:/build_data -e BUILD_DATA_DIR=/build_data -e COUCHDB_URL=http://couchdb:5984/gpii [-e CLEAR_INDEX=1] -v /home/vagrant/sync/universal:/universal -e NODE_PATH=/universal gpii/gpii-dataloader
+$ docker run --name dataloader --link couchdb -v /home/vagrant/sync/universal/testData/dbData:/static_data -e STATIC_DATA_DIR=/static_data -v /home/vagrant/sync/universal/build/dbData:/build_data -e BUILD_DATA_DIR=/build_data -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX=1 gpii/gpii-dataloader
+```
+
+The second version has `CLEAR_INDEX` set to nothing such that any existing database is left intact prior to subsequent changes to it (e.g., deleting the snapsets):
+
+```
+$ docker run --name dataloader --link couchdb -v /home/vagrant/sync/universal/testData/dbData:/static_data -e STATIC_DATA_DIR=/static_data -v /home/vagrant/sync/universal/build/dbData:/build_data -e BUILD_DATA_DIR=/build_data -e COUCHDB_URL=http://couchdb:5984/gpii -e CLEAR_INDEX= gpii/gpii-dataloader
+```
 ```

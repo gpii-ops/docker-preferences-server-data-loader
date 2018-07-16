@@ -2,7 +2,6 @@
 
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
 BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData}
-NODE_PATH=${NODE_PATH:-/home/node/universal}
 
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
@@ -39,15 +38,16 @@ log "Node path: $NODE_PATH"
 log "Working directory: `pwd`"
 
 # Set up universal
-git clone https://github.com/GPII/universal.git
+git clone --depth 1 https://github.com/GPII/universal.git
 cd universal
-rm -f package-lock.json
+
 npm install json5
 npm install fs
 npm install rimraf
 npm install mkdirp
+npm install infusion
+rm -f package-lock.json
 node scripts/convertPrefs.js testData/preferences/ build/dbData/
-cd -
 
 # Initialize (possibly clear) data base
 if [ ! -z "$CLEAR_INDEX" ]; then
@@ -63,6 +63,6 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
-node $NODE_PATH/scripts/deleteSnapsets.js $COUCHDB_URL
+node scripts/deleteSnapsets.js $COUCHDB_URL
 loadData $STATIC_DATA_DIR
 loadData $BUILD_DATA_DIR
