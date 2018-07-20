@@ -34,7 +34,6 @@ log "Starting"
 log "Clear index: $CLEAR_INDEX"
 log "Static: $STATIC_DATA_DIR"
 log "Build: $BUILD_DATA_DIR"
-log "Node path: $NODE_PATH"
 log "Working directory: `pwd`"
 
 # Set up universal
