@@ -7,24 +7,6 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
-loadData() {
-  log "Loading data from $1"
-
-  for file in $1/*.json; do
-    log "Submitting $file"
-
-    curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
-{"docs": $(cat $file)}
-CURL_DATA
-
-    if [ $? -ne 0 ]; then
-      log "Error submitting $file. Terminating."
-      exit 1
-    fi
-  done
-  log "Finished loading data from $1"
-}
-
 if [ -z "$COUCHDB_URL" ]; then
   echo "COUCHDB_URL environment variable must be defined"
   exit 1
@@ -62,6 +44,4 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
-node scripts/deleteSnapsets.js $COUCHDB_URL
-loadData $STATIC_DATA_DIR
-loadData $BUILD_DATA_DIR
+node scripts/deleteAndLoadSnapsets.js $COUCHDB_URL $STATIC_DATA_DIR $BUILD_DATA_DIR
