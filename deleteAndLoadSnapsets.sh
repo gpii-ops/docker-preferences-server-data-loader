@@ -7,12 +7,24 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
+# Verify variables
 if [ -z "$COUCHDB_URL" ]; then
   echo "COUCHDB_URL environment variable must be defined"
   exit 1
 fi
 
+if [ ! -d "$STATIC_DATA_DIR" -o ! "$(ls -A $STATIC_DATA_DIR/*.json)" ]; then
+  echo "STATIC_DATA_DIR ($STATIC_DATA_DIR) must exist and contain data"
+  exit 1
+fi
+
+if [ ! -d "$BUILD_DATA_DIR" -o ! "$(ls -A $BUILD_DATA_DIR/*.json)" ]; then
+  echo "BUILD_DATA_DIR ($BUILD_DATA_DIR) must exist and contain data"
+  exit 1
+fi
+
 log "Starting"
+log "CouchDB: $COUCHDB_URL"
 log "Clear index: $CLEAR_INDEX"
 log "Static: $STATIC_DATA_DIR"
 log "Build: $BUILD_DATA_DIR"
