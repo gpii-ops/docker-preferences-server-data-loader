@@ -1,7 +1,7 @@
 #!/bin/sh
 
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
-BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData}
+BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData/snapset}
 
 log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
@@ -40,7 +40,7 @@ npm install rimraf
 npm install mkdirp
 npm install infusion
 rm -f package-lock.json
-node scripts/convertPrefs.js testData/preferences/ build/dbData/
+node scripts/convertPrefs.js testData/preferences/ build/dbData/snapset snapset
 
 # Initialize (possibly clear) data base
 if [ ! -z "$CLEAR_INDEX" ]; then
