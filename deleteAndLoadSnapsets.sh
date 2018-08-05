@@ -15,18 +15,18 @@ if [ -z "$COUCHDB_URL" ]; then
 fi
 
 if [ ! -d "$STATIC_DATA_DIR" -o ! "$(ls -A $STATIC_DATA_DIR/*.json)" ]; then
-  echo "STATIC_DATA_DIR ($STATIC_DATA_DIR) must exist and contain data"
-  exit 1
+  echo "STATIC_DATA_DIR ($STATIC_DATA_DIR) does not exist or does not contain data, using universal's 'testData/dbData' as the default"
+  STATIC_DATA_DIR=./testData/dbData
 fi
 
 if [ ! -d "$BUILD_DATA_DIR" -o ! "$(ls -A $BUILD_DATA_DIR/*.json)" ]; then
-  echo "BUILD_DATA_DIR ($BUILD_DATA_DIR) must exist and contain data"
-  exit 1
+  echo "BUILD_DATA_DIR ($BUILD_DATA_DIR) does not exist or does not contain data, using universal's 'build/dbData/snapset' as the default"
+  BUILD_DATA_DIR=./build/dbData/snapset
 fi
 
 if [ ! -d "$BUILD_DEMOUSER_DIR" -o ! "$(ls -A $BUILD_DEMOUSER_DIR/*.json)" ]; then
-  echo "BUILD_DATA_DIR ($BUILD_DEMOUSER_DIR) must exist and contain data"
-  exit 1
+  echo "BUILD_DEMOUSER_DIR ($BUILD_DEMOUSER_DIR) does not exist or does not contain data, using universal's 'build/dbData/demouser' as the default"
+  BUILD_DEMOUSER_DIR=./build/dbData/demouser
 fi
 
 COUCHDB_URL_SANITIZED=`echo "$COUCHDB_URL" | sed -e 's,\(://\)[^/]*\(@\),\1<SENSITIVE>\2,g'`
