@@ -8,6 +8,24 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
+loadStaticData() {
+  log "Loading static data from $STATIC_DATA_DIR"
+
+  for file in $STATIC_DATA_DIR/*.json; do
+    log "Submitting $file"
+
+    curl -H 'Content-Type: application/json' -X POST "$COUCHDB_URL/_bulk_docs" -d @- <<CURL_DATA
+{"docs": $(cat $file)}
+CURL_DATA
+
+    if [ $? -ne 0 ]; then
+      log "Error submitting $file. Terminating."
+      exit 1
+    fi
+  done
+  log "Finished loading static data from $STATIC_DATA_DIR"
+}
+
 # Verify variables
 if [ -z "$COUCHDB_URL" ]; then
   echo "COUCHDB_URL environment variable must be defined"
@@ -66,4 +84,5 @@ if ! curl -fsS -X PUT "$COUCHDB_URL"; then
 fi
 
 # Submit data
+loadStaticData
 node scripts/deleteAndLoadSnapsets.js $COUCHDB_URL $STATIC_DATA_DIR $BUILD_DATA_DIR $BUILD_DEMOUSER_DIR
