@@ -7,10 +7,14 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
-warm(){
-  VIEW=$1
+warm_indices(){
+  log "Warming indices..."
 
-  curl -fsS $COUCHDB_URL/_design/views/_view/$VIEW >/dev/null
+  for view in $(curl -s $COUCHDB_URL/_design/views/ | jq -r '.views | keys[]'); do
+    curl -fsS $COUCHDB_URL/_design/views/_view/$view >/dev/null
+  done
+
+  log "Finished warming indices..."
 }
 
 loadData() {
@@ -55,8 +59,4 @@ loadData $STATIC_DATA_DIR
 loadData $BUILD_DATA_DIR
 
 # Warm Data
-log "Warming indices..."
-warm findPrefsSafeByGpiiKey
-warm findClientByOauth2ClientId
-warm findAuthorizationByAccessToken
-log "Finished warming indices..."
+warm_indices
