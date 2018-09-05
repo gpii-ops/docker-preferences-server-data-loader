@@ -2,7 +2,7 @@ FROM node:8-alpine
 
 WORKDIR /home/node
 
-RUN apk add --no-cache curl git && \
+RUN apk add --no-cache curl git jq && \
     git clone https://github.com/GPII/universal.git && \
     cd universal && \
     rm -f package-lock.json && \
