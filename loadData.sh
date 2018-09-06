@@ -7,6 +7,16 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
+warm_indices(){
+  log "Warming indices..."
+
+  for view in $(curl -s $COUCHDB_URL/_design/views/ | jq -r '.views | keys[]'); do
+    curl -fsS $COUCHDB_URL/_design/views/_view/$view >/dev/null
+  done
+
+  log "Finished warming indices..."
+}
+
 loadData() {
   log "Loading data from $1"
 
@@ -47,3 +57,6 @@ fi
 # Submit data
 loadData $STATIC_DATA_DIR
 loadData $BUILD_DATA_DIR
+
+# Warm Data
+warm_indices
