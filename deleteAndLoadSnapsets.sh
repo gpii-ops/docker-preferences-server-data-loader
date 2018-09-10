@@ -8,6 +8,16 @@ log() {
   echo "$(date +'%Y-%m-%d %H:%M:%S') - $1"
 }
 
+warm_indices(){
+  log "Warming indices..."
+
+  for view in $(curl -s $COUCHDB_URL/_design/views/ | jq -r '.views | keys[]'); do
+    curl -fsS $COUCHDB_URL/_design/views/_view/$view >/dev/null
+  done
+
+  log "Finished warming indices..."
+}
+
 loadStaticData() {
   log "Loading static data from $STATIC_DATA_DIR"
 
@@ -86,3 +96,6 @@ fi
 # Submit data
 loadStaticData
 node scripts/deleteAndLoadSnapsets.js $COUCHDB_URL $BUILD_DATA_DIR $BUILD_DEMOUSER_DIR
+
+# Warm Data
+warm_indices

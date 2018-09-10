@@ -2,7 +2,7 @@ FROM node:8-alpine
 
 WORKDIR /home/node
 
-RUN apk add --no-cache curl git
+RUN apk add --no-cache curl git jq
 
 COPY deleteAndLoadSnapsets.sh /usr/local/bin/
 
