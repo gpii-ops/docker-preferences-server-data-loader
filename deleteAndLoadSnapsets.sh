@@ -50,7 +50,7 @@ log "Demo User: $BUILD_DEMOUSER_DIR"
 log "Working directory: `pwd`"
 
 # Set up universal
-git clone --depth 1 https://github.com/GPII/universal.git
+git clone --depth 1 --branch GPII-3138 https://github.com/klown/universal.git
 cd universal
 
 npm install json5
