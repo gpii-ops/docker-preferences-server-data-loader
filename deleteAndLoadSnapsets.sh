@@ -64,7 +64,7 @@ fi
 
 log "Creating database at $COUCHDB_URL_SANITIZED"
 if ! curl -fsS -X PUT "$COUCHDB_URL"; then
-  log "Database already exists at $COUCHDB_URL"
+  log "Database already exists at $COUCHDB_URL_SANITIZED"
 fi
 
 # Submit data
