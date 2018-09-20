@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -ex
 
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
 BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData/snapset}
@@ -69,6 +69,11 @@ fi
 
 # Submit data
 node scripts/deleteAndLoadSnapsets.js $COUCHDB_URL $STATIC_DATA_DIR $BUILD_DATA_DIR
+err=$?
+if [ $err != 0 ]; then
+  log "deleteAndLoadSnapsets.js failed with $err, exiting"
+  exit $err
+fi
 
 # Warm Data
 warm_indices
