@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh
 
 STATIC_DATA_DIR=${STATIC_DATA_DIR:-/home/node/universal/testData/dbData}
 BUILD_DATA_DIR=${BUILD_DATA_DIR:-/home/node/universal/build/dbData/snapset}
