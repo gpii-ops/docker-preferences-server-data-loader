@@ -69,6 +69,11 @@ fi
 
 # Submit data
 node scripts/deleteAndLoadSnapsets.js $COUCHDB_URL $STATIC_DATA_DIR $BUILD_DATA_DIR
+err=$?
+if [ $err ]; then
+  log "deleteAndLoadSnapsets.js failed with $err, exiting"
+  exit $err
+fi
 
 # Warm Data
 warm_indices
