@@ -43,7 +43,7 @@ log "Build: $BUILD_DATA_DIR"
 log "Working directory: `pwd`"
 
 # Set up universal
-git clone --depth 1 --branch GPII-3138 https://github.com/klown/universal.git
+git clone --depth 1 https://github.com/GPII/universal.git
 cd universal
 
 npm install json5
